@@ -37,9 +37,11 @@ public:
 
     int draw(cv::Mat& rgb, const std::vector<FaceObject>& faceobjects);
     void seg(cv::Mat &rgb,const FaceObject &obj,cv::Mat &mask,cv::Rect &box);
+    void landmark(cv::Mat &rgb, const FaceObject &obj, std::vector<cv::Point2f> &landmarks);
 private:
     const float meanVals[3] = { 123.675f, 116.28f,  103.53f };
     const float normVals[3] = { 0.01712475f, 0.0175f, 0.01742919f };
+    ncnn::Net facept;
     ncnn::Net faceseg;
     ncnn::Net scrfd;
     bool has_kps;

@@ -262,6 +262,7 @@ int SCRFD::load(AAssetManager* mgr, const char* modeltype, bool use_gpu)
 
     scrfd.opt = ncnn::Option();
     faceseg.opt = ncnn::Option();
+    facept.opt = ncnn::Option();
 #if NCNN_VULKAN
     scrfd.opt.use_vulkan_compute = use_gpu;
     faceseg.opt.num_threads = ncnn::get_big_cpu_count();
@@ -269,7 +270,7 @@ int SCRFD::load(AAssetManager* mgr, const char* modeltype, bool use_gpu)
 
     scrfd.opt.num_threads = ncnn::get_big_cpu_count();
     faceseg.opt.num_threads = ncnn::get_big_cpu_count();
-
+    facept.opt.num_threads = ncnn::get_big_cpu_count();
 
     char parampath[256];
     char modelpath[256];
@@ -280,6 +281,8 @@ int SCRFD::load(AAssetManager* mgr, const char* modeltype, bool use_gpu)
     scrfd.load_model(mgr, modelpath);
     faceseg.load_param(mgr,"faceseg-op.param");
     faceseg.load_model(mgr,"faceseg-op.bin");
+    facept.load_param(mgr,"facemesh-op.param");
+    facept.load_model(mgr,"facemesh-op.bin");
     has_kps = strstr(modeltype, "_kps") != NULL;
 
     return 0;
@@ -501,6 +504,41 @@ void SCRFD::seg(cv::Mat &rgb, const FaceObject &obj,cv::Mat &mask,cv::Rect &box)
     //cv::resize(mask,mask,faceRoiImage.size(),0,0,cv::INTER_NEAREST);
 
 }
+
+void SCRFD::landmark(cv::Mat &rgb, const FaceObject &obj, std::vector<cv::Point2f> &landmarks)
+{
+    int pad = obj.rect.height;
+    cv::Rect box;
+
+    box.x = (obj.rect.x+obj.rect.width/2)-pad/2;
+    box.y = obj.rect.y;
+    box.width = obj.rect.height;
+    box.height = obj.rect.height;
+
+    box.x = std::max(0.f,(float)box.x);
+    box.y = std::max(0.f,(float)box.y);
+    box.width = box.x+box.width<rgb.cols?box.width:rgb.cols-box.x-1;
+    box.height = box.y+box.height<rgb.rows?box.height:rgb.rows-box.y-1;
+
+    cv::Mat faceRoiImage = rgb(box).clone();
+    ncnn::Extractor ex_face = facept.create_extractor();
+    ncnn::Mat ncnn_in = ncnn::Mat::from_pixels_resize(faceRoiImage.data,ncnn::Mat::PIXEL_RGB, faceRoiImage.cols, faceRoiImage.rows,192,192);
+    const float means[3] = { 127.5f, 127.5f,  127.5f };
+    const float norms[3] = { 1/127.5f, 1 / 127.5f, 1 / 127.5f };
+    ncnn_in.substract_mean_normalize(means, norms);
+    ex_face.input("input.1",ncnn_in);
+    ncnn::Mat ncnn_out;
+    ex_face.extract("482",ncnn_out);
+    float *scoredata = (float*)ncnn_out.data;
+    for(int i = 0; i < 468; i++)
+    {
+        cv::Point2f pt;
+        pt.x = scoredata[i*3]*box.width/192+box.x;
+        pt.y = scoredata[i*3+1]*box.width/192+box.y;
+        landmarks.push_back(pt);
+    }
+
+}
 int SCRFD::draw(cv::Mat& rgb, const std::vector<FaceObject>& faceobjects)
 {
     static const unsigned  char face_part_colors[8][3] = {{0, 0, 255}, {255, 85, 0}, {255, 170, 0},
@@ -509,7 +547,8 @@ int SCRFD::draw(cv::Mat& rgb, const std::vector<FaceObject>& faceobjects)
     for (size_t i = 0; i < faceobjects.size(); i++)
     {
         const FaceObject& obj = faceobjects[i];
-
+        //face segmentation
+        /*
         cv::Mat mask = cv::Mat::zeros(256, 256, CV_8UC1);
         cv::Rect  box;
         seg(rgb,obj,mask,box);
@@ -529,6 +568,14 @@ int SCRFD::draw(cv::Mat& rgb, const std::vector<FaceObject>& faceobjects)
                                     face_part_colors[index][0]*0.3+pRgb[w][0]*0.7);
             }
         }
+         */
+
+        //mediapipe face mesh
+        std::vector<cv::Point2f> pts;
+        landmark(rgb,obj,pts);
+        for(int i = 0; i < pts.size(); i++)
+            cv::circle(rgb,pts[i],2,cv::Scalar(255,255,0),-1);
+
         cv::rectangle(rgb, obj.rect, cv::Scalar(0, 255, 0));
 
         if (has_kps)
