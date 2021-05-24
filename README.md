@@ -5,5 +5,6 @@ face detect and segmentation,facemesh(mediapipe) by ncnn
 PS:facemesh result maybe different from mediapipe because of some ops convert,hope anyone refine it.  
 Reference:  
 https://github.com/nihui/ncnn-android-scrfd  
+https://github.com/deepcam-cn/yolov5-face  
 https://github.com/Tencent/ncnn  
 https://github.com/thepowerfuldeez/facemesh.pytorch  
