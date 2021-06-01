@@ -1,5 +1,5 @@
 # ncnn_Android_face
-face detect and segmentation,facemesh(mediapipe) by ncnn  
+face detect and segmentation,facemesh by ncnn  
 ![image](https://github.com/FeiGeChuanShu/ncnn_Android_face/blob/main/result.gif)  
 ![image](https://github.com/FeiGeChuanShu/ncnn_Android_face/blob/main/facemesh.gif)  
 ![image](https://github.com/FeiGeChuanShu/ncnn_Android_face/blob/main/yolov5-face.gif)  
