@@ -294,7 +294,7 @@ int YoloFace::load(AAssetManager* mgr, const char* modeltype, int _target_size, 
 int YoloFace::detect(const cv::Mat& rgb, std::vector<Object>& objects, float prob_threshold, float nms_threshold)
 {
   
-    target_size = 320;
+    target_size = 640;
     int img_w = rgb.cols;
     int img_h = rgb.rows;
 
