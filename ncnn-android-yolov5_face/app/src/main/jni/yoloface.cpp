@@ -160,7 +160,7 @@ static void generate_proposals(const ncnn::Mat& anchors, int stride, const ncnn:
 
                 float box_score = featptr[4];
 
-				float confidence = sigmoid(box_score); //* sigmoid(class_score);
+		float confidence = sigmoid(box_score); //* sigmoid(class_score);
 
                 if (confidence >= prob_threshold)
                 {
@@ -185,9 +185,6 @@ static void generate_proposals(const ncnn::Mat& anchors, int stride, const ncnn:
                     float x1 = pb_cx + pb_w * 0.5f;
                     float y1 = pb_cy + pb_h * 0.5f;
 
-					
-
-
                     Object obj;
                     obj.rect.x = x0;
                     obj.rect.y = y0;
@@ -196,13 +193,13 @@ static void generate_proposals(const ncnn::Mat& anchors, int stride, const ncnn:
                     obj.label = class_index;
                     obj.prob = confidence;
 
-					for (int l = 0; l < 5; l++)
-					{
-						float x = featptr[2 * l + 5] * anchor_w + j * stride;
-						float y = featptr[2 * l + 1 + 5] * anchor_h + i * stride;
-						obj.pts.push_back(cv::Point2f(x, y));
-					}
-                    objects.push_back(obj);
+		    for (int l = 0; l < 5; l++)
+		    {
+			float x = featptr[2 * l + 5] * anchor_w + j * stride;
+			float y = featptr[2 * l + 1 + 5] * anchor_h + i * stride;
+			obj.pts.push_back(cv::Point2f(x, y));
+		    }
+	            objects.push_back(obj);
                 }
             }
         }
@@ -215,8 +212,6 @@ YoloFace::YoloFace()
 {
     blob_pool_allocator.set_size_compare_ratio(0.f);
     workspace_pool_allocator.set_size_compare_ratio(0.f);
-
-
 }
 
 int YoloFace::load(const char* modeltype, int _target_size, const float* _mean_vals, const float* _norm_vals, bool use_gpu)
@@ -319,8 +314,8 @@ int YoloFace::detect(const cv::Mat& rgb, std::vector<Object>& objects, float pro
 
     // pad to target_size rectangle
     // yolov5/utils/datasets.py letterbox
-	int wpad = (w + 31) / 32 * 32 - w;
-	int hpad = (h + 31) / 32 * 32 - h;
+    int wpad = (w + 31) / 32 * 32 - w;
+    int hpad = (h + 31) / 32 * 32 - h;
     ncnn::Mat in_pad;
     ncnn::copy_make_border(in, in_pad, hpad / 2, hpad - hpad / 2, wpad / 2, wpad - wpad / 2, ncnn::BORDER_CONSTANT, 114.f);
 
@@ -412,12 +407,12 @@ int YoloFace::detect(const cv::Mat& rgb, std::vector<Object>& objects, float pro
         float x1 = (objects[i].rect.x + objects[i].rect.width - (wpad / 2)) / scale;
         float y1 = (objects[i].rect.y + objects[i].rect.height - (hpad / 2)) / scale;
 
-		for (int j = 0; j < objects[i].pts.size(); j++)
-		{
-			float ptx = (objects[i].pts[j].x - (wpad / 2)) / scale;
-			float pty = (objects[i].pts[j].y - (hpad / 2)) / scale;
-			objects[i].pts[j] = cv::Point2f(ptx, pty);
-		}
+        for (int j = 0; j < objects[i].pts.size(); j++)
+	{
+	    float ptx = (objects[i].pts[j].x - (wpad / 2)) / scale;
+	    float pty = (objects[i].pts[j].y - (hpad / 2)) / scale;
+	    objects[i].pts[j] = cv::Point2f(ptx, pty);
+	}
 
         // clip
         x0 = std::max(std::min(x0, (float)(img_w - 1)), 0.f);
