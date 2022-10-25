@@ -8,3 +8,4 @@ https://github.com/nihui/ncnn-android-scrfd
 https://github.com/deepcam-cn/yolov5-face  
 https://github.com/Tencent/ncnn  
 https://github.com/thepowerfuldeez/facemesh.pytorch  
+https://github.com/derronqi/yolov7-face  
