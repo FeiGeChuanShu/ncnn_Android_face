@@ -193,13 +193,13 @@ static void generate_proposals(const ncnn::Mat& anchors, int stride, const ncnn:
                     obj.label = class_index;
                     obj.prob = confidence;
 
-		    for (int l = 0; l < 5; l++)
-		    {
-			float x = featptr[2 * l + 5] * anchor_w + j * stride;
-			float y = featptr[2 * l + 1 + 5] * anchor_h + i * stride;
-			obj.pts.push_back(cv::Point2f(x, y));
-		    }
-	            objects.push_back(obj);
+                    for (int l = 0; l < 5; l++)
+                    {
+                        float x = featptr[2 * l + 5] * anchor_w + j * stride;
+                        float y = featptr[2 * l + 1 + 5] * anchor_h + i * stride;
+                        obj.pts.push_back(cv::Point2f(x, y));
+                    }
+                    objects.push_back(obj);
                 }
             }
         }
@@ -408,11 +408,11 @@ int YoloFace::detect(const cv::Mat& rgb, std::vector<Object>& objects, float pro
         float y1 = (objects[i].rect.y + objects[i].rect.height - (hpad / 2)) / scale;
 
         for (int j = 0; j < objects[i].pts.size(); j++)
-	{
-	    float ptx = (objects[i].pts[j].x - (wpad / 2)) / scale;
-	    float pty = (objects[i].pts[j].y - (hpad / 2)) / scale;
-	    objects[i].pts[j] = cv::Point2f(ptx, pty);
-	}
+        {
+            float ptx = (objects[i].pts[j].x - (wpad / 2)) / scale;
+            float pty = (objects[i].pts[j].y - (hpad / 2)) / scale;
+            objects[i].pts[j] = cv::Point2f(ptx, pty);
+        }
 
         // clip
         x0 = std::max(std::min(x0, (float)(img_w - 1)), 0.f);
