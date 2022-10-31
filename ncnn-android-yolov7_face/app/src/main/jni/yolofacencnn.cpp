@@ -183,12 +183,14 @@ JNIEXPORT jboolean JNICALL Java_com_tencent_ncnnyoloface_NcnnYoloFace_loadModel(
 
     const char* modeltypes[] =
     {
-        "yolov5n-0.5",
+        "yolov7-lite-e",
+        "yolov7-tiny"
     };
 
     const int target_sizes[] =
     {
-        320,
+        640,
+        640
     };
 
     const float mean_vals[][3] =
@@ -198,6 +200,7 @@ JNIEXPORT jboolean JNICALL Java_com_tencent_ncnnyoloface_NcnnYoloFace_loadModel(
 
     const float norm_vals[][3] =
     {
+        {1 / 255.f, 1 / 255.f, 1 / 255.f},
         {1 / 255.f, 1 / 255.f, 1 / 255.f},
     };
 

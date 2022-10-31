@@ -228,14 +228,14 @@ int YoloFace::load(AAssetManager* mgr, const char* modeltype, int _target_size, 
     yoloface.opt.blob_allocator = &blob_pool_allocator;
     yoloface.opt.workspace_allocator = &workspace_pool_allocator;
 
-    yoloface.load_param(mgr, "yolov7-tiny-face.param");
-    yoloface.load_model(mgr, "yolov7-tiny-face.bin");
-
+    char parampath[256];
+    char modelpath[256];
+    sprintf(parampath, "%s.param", modeltype);
+    sprintf(modelpath, "%s.bin", modeltype);
+    yoloface.load_param(mgr, parampath);
+    yoloface.load_model(mgr, modelpath);
 
     target_size = _target_size;
-    mean_vals[0] = _mean_vals[0];
-    mean_vals[1] = _mean_vals[1];
-    mean_vals[2] = _mean_vals[2];
     norm_vals[0] = _norm_vals[0];
     norm_vals[1] = _norm_vals[1];
     norm_vals[2] = _norm_vals[2];
@@ -292,7 +292,7 @@ int YoloFace::detect(const cv::Mat& rgb, std::vector<Object>& objects, float pro
     // stride 8
     {
         ncnn::Mat out;
-        ex.extract("397", out);
+        ex.extract("stride_8", out);
 
         ncnn::Mat anchors(6);
         anchors[0] = 4.f;
@@ -312,7 +312,7 @@ int YoloFace::detect(const cv::Mat& rgb, std::vector<Object>& objects, float pro
     {
         ncnn::Mat out;
 
-        ex.extract("458", out);
+        ex.extract("stride_16", out);
 
         ncnn::Mat anchors(6);
         anchors[0] = 15.f;
@@ -332,7 +332,7 @@ int YoloFace::detect(const cv::Mat& rgb, std::vector<Object>& objects, float pro
     {
         ncnn::Mat out;
 
-        ex.extract("519", out);
+        ex.extract("stride_32", out);
 
         ncnn::Mat anchors(6);
         anchors[0] = 72.f;
